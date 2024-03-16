@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Clone</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS untuk tampilan */
+        body {
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        .navbar-light .navbar-nav .nav-link {
+            color: #606060;
+        }
+
+        .navbar-light .navbar-nav .nav-link:hover {
+            color: #000000;
+        }
+
+        .form-control {
+            border-radius: 20px;
+        }
+
+        .video-player {
+            position: relative;
+            padding-top: 56.25%;
+            /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 70px;
+            /* Margin atas untuk navbar */
+        }
+
+        .video-player iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-info {
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .video-info h4 {
+            color: #000000;
+            transition: all 0.3s ease;
+        }
+
+        .video-info p {
+            color: #606060;
+            transition: all 0.3s ease;
+        }
+
+        .video-list {
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .video-list h4 {
+            color: #000000;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item h5 {
+            color: #000000;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item p {
+            color: #606060;
+            margin-bottom: 0;
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item:hover {
+            background-color: #f0f0f0;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigasi -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">YouTube Clone</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Trending</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Abu-Abu</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Cari" aria-label="Search">
+                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Cari</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Video Player dan Informasi -->
+    <div id="app" class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="video-player">
+                    <iframe width="100%" height="100%" :src="currentVideo" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div class="video-info">
+                    <h4>{{ currentTitle }}</h4>
+                    <p>{{ currentDescription }}</p>
+                </div>
+            </div>
+            <!-- Daftar Video Terkait -->
+            <div class="col-md-4 mt-5">
+                <div class="video-list">
+                    <h4>Video Terkait</h4>
+                    <div v-for="(video, index) in relatedVideos" :key="index" class="list-group">
+                        <a @click="changeVideo(video.id)" class="list-group-item list-group-item-action">
+                            <img :src="video.thumbnail" alt="Video Thumbnail">
+                            <h5>{{ video.title }}</h5>
+                            <p>{{ video.description }}</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                currentVideo: 'https://www.youtube.com/embed/XsfofC2eteo?si=E9mujJSpTJ_bGRrh',
+                currentTitle: 'Judul Video',
+                currentDescription: 'Deskripsi video singkat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, lectus nec facilisis fermentum, tortor nisi vestibulum sapien, vel bibendum eros nunc at urna. Vivamus ac dui quis turpis molestie lobortis a eu lacus.',
+                relatedVideos: [
+                    { id: '2qUFrVHnebU?si=v0XUT0IwNa5_heU-', thumbnail: 'https://i.ytimg.com/vi/OwSlL-33JcM/hqdefault.jpg', title: 'Judul Video 1', description: 'Deskripsi video singkat.' },
+                    { id: 'ljhlj2YkStc?si=6e3xd1OlI_rf_S6J', thumbnail: 'https://via.placeholder.com/150x100', title: 'Judul Video 2', description: 'Deskripsi video singkat.' },
+                    { id: '_lnVwkykbQ8?si=HpOvj6iou0TIKDJ-', thumbnail: 'https://via.placeholder.com/150x100', title: 'Judul Video 3', description: 'Deskripsi video singkat.' }
+                ]
+            },
+            methods: {
+                changeVideo(videoId) {
+                    this.currentVideo = `https://www.youtube.com/embed/${videoId}`;
+                    // Anda dapat menambahkan logika untuk mengubah judul dan deskripsi video saat ini di sini
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

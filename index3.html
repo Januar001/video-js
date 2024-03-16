@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <style>
+        /* Custom CSS untuk tampilan */
+        body {
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        .navbar-light .navbar-nav .nav-link {
+            color: #606060;
+        }
+
+        .navbar-light .navbar-nav .nav-link:hover {
+            color: #000000;
+        }
+
+        .form-control {
+            border-radius: 20px;
+        }
+
+        .video-player {
+            position: relative;
+            padding-top: 56.25%;
+            /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 70px;
+            border-radius: 15px;
+            /* Margin atas untuk navbar */
+        }
+
+        .video-player video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            border: none;
+        }
+
+        .list-group-item h5,
+        .list-group-item p {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .video-info {
+            background-color: #f5f5f5;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border-radius: 15px;
+        }
+
+        .video-info h4 {
+            color: #000000;
+        }
+
+        .video-info p {
+            color: #606060;
+        }
+
+        .video-list {
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border-radius: 15px;
+        }
+
+        .video-list h4 {
+            color: #000000;
+            margin-bottom: 15px;
+        }
+
+        .list-group-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .list-group-item h5 {
+            color: #000000;
+            margin-bottom: 5px;
+        }
+
+        .list-group-item p {
+            color: #606060;
+            margin-bottom: 0;
+        }
+
+        .list-group-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigasi -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Video Player</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Trending</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Abu-Abu</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Cari" aria-label="Search">
+                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Cari</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Video Player dan Informasi -->
+    <div id="app" class="container mt-5">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="video-player">
+                    <video controls @play="updateVideoInfo">
+                        <source :src="currentVideo" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h4>{{ currentTitle }}</h4>
+                    <p>{{ currentDescription }}</p>
+                </div>
+            </div>
+            <!-- Daftar Video Terkait -->
+            <div class="col-md-4 mt-5">
+                <div class="video-list">
+                    <h4>Video Terkait</h4>
+                    <div v-for="(video, index) in relatedVideos" :key="index" class="list-group mb-2">
+                        <a @click="changeVideo(video.sources[0], video.title, video.description)"
+                            class="list-group-item list-group-item-action" style="cursor: pointer;">
+                            <div class="video-item">
+                                <div class="thumbnail">
+                                    <img :src="'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/' + video.thumb"
+                                        alt="Video Thumbnail">
+                                </div>
+                                <div class="info">
+                                    <h5>{{ video.title }}</h5>
+                                    <p>{{ video.description }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Mengambil data dari file JSON terpisah menggunakan fetch API
+            fetch('https://raw.githubusercontent.com/Januar001/video-js/main/video.json')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Data JSON:', data);
+                    new Vue({
+                        el: '#app',
+                        data: {
+                            relatedVideos: data.categories[0].videos,
+                            currentVideo: '',
+                            currentTitle: '',
+                            currentDescription: ''
+                        },
+                        methods: {
+                            changeVideo(videoSrc, videoTitle, videoDescription) {
+                                const videoElement = document.querySelector('video');
+
+                                // Atur atribut src dari video
+                                videoElement.src = videoSrc;
+
+                                // Muat ulang video
+                                videoElement.load();
+
+                                // Mulai pemutaran video baru
+                                videoElement.play();
+
+                                // Perbarui judul dan deskripsi
+                                this.currentVideo = videoSrc;
+                                this.currentTitle = videoTitle;
+                                this.currentDescription = videoDescription;
+
+                                this.currentVideo = videoSrc;
+                                this.currentTitle = videoTitle;
+                                this.currentDescription = videoDescription;
+                            },
+                            updateVideoInfo() {
+                                // Periksa video yang sedang diputar
+                                const videoElement = document.querySelector('video');
+                                const currentVideoSrc = videoElement.currentSrc;
+                                const currentVideoIndex = this.relatedVideos.findIndex(video => video.sources[0] === currentVideoSrc);
+                                if (currentVideoIndex !== -1) {
+                                    // Update judul dan deskripsi berdasarkan video yang diputar
+                                    this.currentTitle = this.relatedVideos[currentVideoIndex].title;
+                                    this.currentDescription = this.relatedVideos[currentVideoIndex].description;
+                                }
+                            }
+                        },
+                        mounted() {
+                            // Set video pertama sebagai video saat ini secara default
+                            if (this.relatedVideos.length > 0) {
+                                this.currentVideo = this.relatedVideos[0].sources[0];
+                                this.currentTitle = this.relatedVideos[0].title;
+                                this.currentDescription = this.relatedVideos[0].description;
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+
+
+</body>
+
+</html>
