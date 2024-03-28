@@ -1,0 +1,25 @@
+{
+    "currentVideo": "https://www.youtube.com/embed/2qUFrVHnebU?si=v0XUT0IwNa5_heU-",
+    "currentTitle": "Judul Video",
+    "currentDescription": "Deskripsi video singkat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, lectus nec facilisis fermentum, tortor nisi vestibulum sapien, vel bibendum eros nunc at urna. Vivamus ac dui quis turpis molestie lobortis a eu lacus.",
+    "relatedVideos": [
+        {
+            "id": "2qUFrVHnebU?si=v0XUT0IwNa5_heU-",
+            "thumbnail": "https://i.ytimg.com/vi/OwSlL-33JcM/hqdefault.jpg",
+            "title": "Judul Video 1",
+            "description": "Deskripsi video singkat."
+        },
+        {
+            "id": "ljhlj2YkStc?si=6e3xd1OlI_rf_S6J",
+            "thumbnail": "https://via.placeholder.com/150x100",
+            "title": "Judul Video 2",
+            "description": "Deskripsi video singkat."
+        },
+        {
+            "id": "_lnVwkykbQ8?si=HpOvj6iou0TIKDJ-",
+            "thumbnail": "https://via.placeholder.com/150x100",
+            "title": "Judul Video 3",
+            "description": "Deskripsi video singkat."
+        }
+    ]
+}
