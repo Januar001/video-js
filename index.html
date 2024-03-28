@@ -88,6 +88,24 @@
             transition: all 0.3s ease;
         }
 
+        .video-item {
+            margin-bottom: 10px;
+            /* Jarak antar video */
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 0.5s;
+            /* Animasi durasi perpindahan */
+        }
+
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+            /* Awal dan akhir animasi */
+        }
+
+
         .list-group-item img {
             width: 100%;
             height: 100px;
@@ -113,6 +131,23 @@
             background-color: #f0f0f0;
             transition: all 0.3s ease;
         }
+
+        @keyframes slideUp {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Animasi untuk video yang berada di paling atas */
+        .animated-video {
+            animation: slideUp 0.5s ease;
+        }
     </style>
 </head>
 
@@ -121,8 +156,7 @@
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">YouTube Clone</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -159,15 +193,17 @@
             </div>
             <!-- Daftar Video Terkait -->
             <div class="col-md-4 mt-5">
-                <div class="video-list">
+                <div class="video-list rounded">
                     <h4>Video Terkait</h4>
-                    <div v-for="(video, index) in relatedVideos" :key="index" class="list-group">
-                        <a @click="changeVideo(video.id)" class="list-group-item list-group-item-action">
-                            <img :src="video.thumbnail" alt="Video Thumbnail">
-                            <h5>{{ video.title }}</h5>
-                            <p>{{ video.description }}</p>
-                        </a>
-                    </div>
+                    <transition-group name="fade" tag="div">
+                        <div v-for="(video, index) in relatedVideos" :key="index" class="list-group video-item" :class="{ 'animated-video': index === 0 }">
+                            <a @click="changeVideo(index)" class="list-group-item list-group-item-action">
+                                <img :src="video.thumbnail" alt="Video Thumbnail">
+                                <h5>{{ video.title }}</h5>
+                                <p>{{ video.description }}</p>
+                            </a>
+                        </div>
+                    </transition-group>
                 </div>
             </div>
         </div>
@@ -179,21 +215,42 @@
         new Vue({
             el: '#app',
             data: {
-                currentVideo: 'https://www.youtube.com/embed/XsfofC2eteo?si=E9mujJSpTJ_bGRrh',
-                currentTitle: 'Judul Video',
-                currentDescription: 'Deskripsi video singkat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, lectus nec facilisis fermentum, tortor nisi vestibulum sapien, vel bibendum eros nunc at urna. Vivamus ac dui quis turpis molestie lobortis a eu lacus.',
-                relatedVideos: [
-                    { id: '2qUFrVHnebU?si=v0XUT0IwNa5_heU-', thumbnail: 'https://i.ytimg.com/vi/OwSlL-33JcM/hqdefault.jpg', title: 'Judul Video 1', description: 'Deskripsi video singkat.' },
-                    { id: 'ljhlj2YkStc?si=6e3xd1OlI_rf_S6J', thumbnail: 'https://via.placeholder.com/150x100', title: 'Judul Video 2', description: 'Deskripsi video singkat.' },
-                    { id: '_lnVwkykbQ8?si=HpOvj6iou0TIKDJ-', thumbnail: 'https://via.placeholder.com/150x100', title: 'Judul Video 3', description: 'Deskripsi video singkat.' }
-                ]
+                currentVideo: '',
+                currentTitle: '',
+                currentDescription: '',
+                relatedVideos: []
+            },
+            mounted() {
+                // fetch('data.json')
+                fetch('data.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.currentVideo = data.currentVideo;
+                        this.currentTitle = data.currentTitle;
+                        this.currentDescription = data.currentDescription;
+                        this.relatedVideos = data.relatedVideos;
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
             },
             methods: {
-                changeVideo(videoId) {
-                    this.currentVideo = `https://www.youtube.com/embed/${videoId}`;
-                    // Anda dapat menambahkan logika untuk mengubah judul dan deskripsi video saat ini di sini
+                changeVideo(index) {
+                    const selectedVideo = this.relatedVideos[index];
+                    this.relatedVideos.splice(index, 1); // Hapus video yang diputar dari posisi saat ini
+                    this.relatedVideos.unshift(selectedVideo); // Masukkan video yang diputar di bagian atas daftar
+                    this.currentVideo = `https://www.youtube.com/embed/${selectedVideo.id}`;
+                    this.currentTitle = selectedVideo.title;
+                    this.currentDescription = selectedVideo.description;
+
+                    // Menambahkan kelas .animated-video pada elemen video yang baru ditambahkan ke atas daftar
+                    this.$nextTick(() => {
+                        const animatedVideo = this.$el.querySelector('.video-item');
+                        if (animatedVideo) {
+                            animatedVideo.classList.add('animated-video');
+                        }
+                    });
                 }
             }
+
         });
     </script>
 </body>
